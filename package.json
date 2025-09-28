@@ -1,0 +1,52 @@
+{
+    "name": "min-desktop",
+    "version": "1.0.0",
+    "description": "",
+    "homepage": "https://github.com/gooseDes/min-desktop#readme",
+    "bugs": {
+        "url": "https://github.com/gooseDes/min-desktop/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/gooseDes/min-desktop.git"
+    },
+    "license": "GPL-3.0-only",
+    "author": "goose_des",
+    "type": "module",
+    "main": "src/index.ts",
+    "scripts": {
+        "start": "tsc && electron -r tsx src/index.ts",
+        "build": "tsc && electron-builder"
+    },
+    "devDependencies": {
+        "electron": "^38.1.2",
+        "electron-builder": "^26.0.12",
+        "esbuild": "^0.25.10",
+        "tsx": "^4.20.6"
+    },
+    "build": {
+        "appId": "com.goosedes.mindesktop",
+        "productName": "Min Desktop",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "src/*",
+            "dist/*.js"
+        ],
+        "win": {
+            "target": "nsis"
+        },
+        "linux": {
+            "target": "AppImage"
+        },
+        "mac": {
+            "target": "dmg"
+        }
+    },
+    "dependencies": {
+        "axios": "^1.12.2",
+        "dotenv": "^17.2.2",
+        "simple-git": "^3.28.0"
+    }
+}

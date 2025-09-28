@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Min — Setting Things Up...</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="App">
+            <div class="WelcomeDiv">Welcome to Min Desktop App!</div>
+            <div class="InputDiv">
+                <p>Client repo:</p>
+                <input type="text" id="repo_input" />
+            </div>
+            <div class="InputDiv">
+                <p>Branch:</p>
+                <input type="text" id="branch_input" />
+            </div>
+            <button id="continue_button">Continue</button>
+            <div class="WarningDiv">If you don't know what this is, just press continue</div>
+        </div>
+        <p id="loading_thing">Loading...</p>
+        <script>
+            const repo_input = document.getElementById("repo_input");
+            repo_input.value = "https://github.com/gooseDes/min-frontend.git";
+            const branch_input = document.getElementById("branch_input");
+            branch_input.value = "gh-pages";
+
+            const continue_btn = document.getElementById("continue_button");
+            continue_btn.addEventListener("click", () => {
+                document.querySelector(".App").classList.add("blured");
+                document.querySelector("#loading_thing").classList.add("show");
+                window.api.downloadAndRun(repo_input.value, branch_input.value);
+            });
+        </script>
+    </body>
+</html>

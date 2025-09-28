@@ -1,0 +1,128 @@
+body {
+    background: #000000dd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+* {
+    color: #fff;
+    overflow: hidden;
+    font-family: "Rubik";
+}
+
+input {
+    border: 2px #fff solid;
+    border-radius: 999px;
+    font-size: 24px;
+    text-align: center;
+    background-color: #33333399;
+    color: #fff;
+    transition: all 0.5s ease, scale 0.2s ease;
+    opacity: 0.8;
+    width: 600px;
+
+    &:hover {
+        opacity: 1;
+        scale: 1.1;
+    }
+}
+
+.App {
+    position: fixed;
+    width: 760px;
+    height: 520px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #242424;
+    border-radius: 2svh;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    transition: filter 0.5s ease;
+
+    &.blured {
+        filter: blur(10px);
+    }
+}
+
+.WarningDiv {
+    position: fixed;
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+}
+
+.InputDiv {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+
+    p {
+        font-size: 24px;
+    }
+}
+
+.WelcomeDiv {
+    width: fit-content;
+    height: fit-content;
+    font-size: 32px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background-color: #00000033;
+    border-radius: 2svh;
+    padding: 10px 20px;
+    color: #fff;
+}
+
+#continue_button {
+    position: fixed;
+    left: 50%;
+    bottom: 50px;
+    background-color: #00000033;
+    border: none;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    translate: -50% 0;
+    transition: scale 0.2s ease;
+
+    &:hover {
+        scale: 1.1;
+    }
+}
+
+#loading_thing {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100vh;
+    color: #fff;
+    background-color: #00000033;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+
+    &.show {
+        opacity: 1;
+    }
+}
