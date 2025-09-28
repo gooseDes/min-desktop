@@ -29,7 +29,7 @@ function createWindow() {
         minWidth: 800,
         minHeight: 600,
         webPreferences: {
-            preload: process.env.DEBUG ? path.join(cwd(), "dist", "preload.js") : path.join(cwd(), "preload.js"),
+            preload: process.env.DEBUG ? path.join(cwd(), "dist", "preload.js") : path.join(app.getAppPath(), "dist", "preload.js"),
             nodeIntegration: false,
             contextIsolation: true,
         },
@@ -38,11 +38,11 @@ function createWindow() {
         vibrancy: "under-window",
     });
 
-    if (process.env.DEBUG !== "TRUE") {
+    if (!process.env.DEBUG || process.env.DEBUG !== "TRUE") {
         win.setMenuBarVisibility(false);
         win.setMenu(null);
     }
-
+    
     win.loadFile(process.env.DEBUG ? "index.html" : "src/index.html");
 }
 
