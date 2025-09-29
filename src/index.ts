@@ -38,10 +38,10 @@ function createWindow() {
         vibrancy: "under-window",
     });
 
-    if (!process.env.DEBUG || process.env.DEBUG !== "TRUE") {
+    /*if (!process.env.DEBUG || process.env.DEBUG !== "TRUE") {
         win.setMenuBarVisibility(false);
         win.setMenu(null);
-    }
+    }*/
     
     win.loadFile(process.env.DEBUG ? "index.html" : "src/index.html");
 }

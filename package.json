@@ -33,7 +33,7 @@
         "files": [
             "src/*",
             "dist/preload.js",
-            "!node_modules"
+            "node_modules/*"
         ],
         "win": {
             "target": "nsis"
