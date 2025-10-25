@@ -26,6 +26,7 @@
     },
     "build": {
         "appId": "com.goosedes.mindesktop",
+        "icon": "assets/icon",
         "productName": "Min Desktop",
         "directories": {
             "output": "dist",
@@ -35,6 +36,12 @@
             {
                 "from": "assets",
                 "to": "assets"
+            }
+        ],
+        "extraFiles": [
+            {
+                "from": "dist/preload.js",
+                "to": "preload.js"
             }
         ],
         "files": [
