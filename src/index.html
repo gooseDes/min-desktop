@@ -34,6 +34,8 @@
             continue_btn.addEventListener("click", () => {
                 document.querySelector(".App").classList.add("blured");
                 document.querySelector("#loading_thing").classList.add("show");
+                localStorage.setItem("client_repo", repo_input.value);
+                localStorage.setItem("branch", branch_input.value);
                 window.api.downloadAndRun(repo_input.value, branch_input.value);
             });
         </script>

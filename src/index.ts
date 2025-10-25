@@ -22,7 +22,7 @@ async function downloadOfflineVersion(repo: string, branch: string) {
 
 let win: electron.BrowserWindow;
 
-function createWindow() {
+async function createWindow() {
     win = new BrowserWindow({
         width: 800,
         height: 600,
@@ -33,7 +33,7 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: true,
         },
-        transparent: true,
+        transparent: false,
         backgroundColor: "#00000000",
         vibrancy: "under-window",
     });
@@ -43,7 +43,13 @@ function createWindow() {
         win.setMenu(null);
     }
 
-    win.loadFile(process.env.DEBUG ? "index.html" : "src/index.html");
+    await win.loadFile(process.env.DEBUG ? "index.html" : "src/index.html");
+    const client_repo = await win.webContents.executeJavaScript('localStorage.getItem("client_repo");');
+    const branch = await win.webContents.executeJavaScript('localStorage.getItem("branch");');
+
+    if (client_repo !== null && branch !== null) {
+        await downloadOfflineVersion(client_repo, branch);
+    }
 }
 
 ipcMain.handle("download-offline-version", async (event, repo: string, branch: string) => {
@@ -52,6 +58,6 @@ ipcMain.handle("download-offline-version", async (event, repo: string, branch: s
 
 app.setName("MinDesktop");
 
-app.whenReady().then(() => {
-    createWindow();
+app.whenReady().then(async () => {
+    await createWindow();
 });
