@@ -1,6 +1,8 @@
 import * as electron from "electron";
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
-import simpleGit from "simple-git";
+import fs from "fs";
+import * as git from "isomorphic-git";
+import http from "isomorphic-git/http/node";
 import path from "path";
 import { rm } from "fs/promises";
 import { fileURLToPath } from "url";
@@ -18,8 +20,16 @@ const __dirname = path.dirname(__filename);
 async function downloadOfflineVersion(repo: string, branch: string) {
     const targetDir = path.resolve(path.join(app.getPath("userData"), "site"));
     await rm(targetDir, { recursive: true, force: true });
-    const git = simpleGit();
-    await git.clone(repo, targetDir, ["--branch", branch, "--single-branch"]);
+    await fs.promises.mkdir(targetDir, { recursive: true });
+    await git.clone({
+        fs,
+        http,
+        dir: targetDir,
+        url: repo,
+        singleBranch: true,
+        ref: branch,
+        depth: 1,
+    });
     await win.loadFile(path.join(targetDir, "index.html"));
     win.maximize();
 }
