@@ -70,7 +70,21 @@ app.setName("MinDesktop");
 app.whenReady().then(async () => {
     await createWindow();
 
-    tray = new Tray("src/logo512.png");
+    let iconPath: string;
+    if (process.env.DEBUG) {
+        iconPath = path.join(__dirname, "..", "assets", "logo512.png");
+    } else {
+        if (process.resourcesPath) {
+            iconPath = path.join(process.resourcesPath, "assets", "logo512.png");
+        } else {
+            // Fallback path
+            iconPath = path.join(app.getAppPath(), "assets", "logo512.png");
+        }
+    }
+
+    console.log("Using icon path:", iconPath);
+    tray = new Tray(iconPath);
+
     const contextMenu = Menu.buildFromTemplate([
         { label: "Open", click: () => win.show() },
         {

@@ -28,11 +28,19 @@
         "appId": "com.goosedes.mindesktop",
         "productName": "Min Desktop",
         "directories": {
-            "output": "dist"
+            "output": "dist",
+            "buildResources": "assets"
         },
+        "extraResources": [
+            {
+                "from": "assets",
+                "to": "assets"
+            }
+        ],
         "files": [
             "src/*",
-            "dist/*.js"
+            "dist/*.js",
+            "assets/**/*"
         ],
         "win": {
             "target": "nsis"
