@@ -1,12 +1,16 @@
 import * as electron from "electron";
-const { app, BrowserWindow, ipcMain } = electron;
+const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
 import simpleGit from "simple-git";
 import path from "path";
 import { rm } from "fs/promises";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
 import { cwd } from "process";
+
 config({ quiet: true });
+
+const customApp = app as electron.App & { isQuiting: boolean };
+customApp.isQuiting = false;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +25,7 @@ async function downloadOfflineVersion(repo: string, branch: string) {
 }
 
 let win: electron.BrowserWindow;
+let tray: electron.Tray;
 
 async function createWindow() {
     win = new BrowserWindow({
@@ -56,8 +61,35 @@ ipcMain.handle("download-offline-version", async (event, repo: string, branch: s
     await downloadOfflineVersion(repo, branch);
 });
 
+ipcMain.on("show-notification", (_, { title, body, icon }) => {
+    new electron.Notification({ title, body, icon }).show();
+});
+
 app.setName("MinDesktop");
 
 app.whenReady().then(async () => {
     await createWindow();
+
+    tray = new Tray("src/logo512.png");
+    const contextMenu = Menu.buildFromTemplate([
+        { label: "Open", click: () => win.show() },
+        {
+            label: "Exit",
+            click: () => {
+                customApp.isQuiting = true;
+                app.quit();
+            },
+        },
+    ]);
+    tray.setToolTip("Min Desktop");
+    tray.setContextMenu(contextMenu);
+
+    tray.on("double-click", () => win.show());
+
+    win.on("close", (event) => {
+        if (!customApp.isQuiting) {
+            event.preventDefault();
+            win.hide();
+        }
+    });
 });
