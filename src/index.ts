@@ -77,12 +77,10 @@ app.whenReady().then(async () => {
         if (process.resourcesPath) {
             iconPath = path.join(process.resourcesPath, "assets", "logo512.png");
         } else {
-            // Fallback path
             iconPath = path.join(app.getAppPath(), "assets", "logo512.png");
         }
     }
 
-    console.log("Using icon path:", iconPath);
     tray = new Tray(iconPath);
 
     const contextMenu = Menu.buildFromTemplate([
