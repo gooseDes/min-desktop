@@ -10,7 +10,6 @@ import { config } from "dotenv";
 import { cwd } from "process";
 import { nativeImage } from "electron/common";
 import axios from "axios";
-import sharp from "sharp";
 
 config({ quiet: true });
 
@@ -90,9 +89,9 @@ ipcMain.on("show-notification", async (_, { title, body, icon }) => {
     if (icon?.startsWith("http")) {
         // Downloading icon if it's a URL
         try {
+            icon = icon.replace(".webp", ".png");
             const res = await axios.get(icon, { responseType: "arraybuffer" });
-            const pngBuf = await sharp(res.data).png().toBuffer();
-            img = nativeImage.createFromBuffer(pngBuf);
+            img = nativeImage.createFromBuffer(res.data);
         } catch (e) {
             console.warn("Failed to load icon from URL:", e);
         }
