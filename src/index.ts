@@ -8,34 +8,45 @@ import { rm } from "fs/promises";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
 import { cwd } from "process";
+import { nativeImage } from "electron/common";
+import axios from "axios";
+import sharp from "sharp";
 
 config({ quiet: true });
 
 const customApp = app as electron.App & { isQuiting: boolean };
-customApp.isQuiting = false;
+customApp.isQuiting = false; // Variable that determines if the app is fully quiting or just closing the window
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function downloadOfflineVersion(repo: string, branch: string) {
+    // Cloning website from repos
     const targetDir = path.resolve(path.join(app.getPath("userData"), "site"));
     await rm(targetDir, { recursive: true, force: true });
     await fs.promises.mkdir(targetDir, { recursive: true });
-    await git.clone({
-        fs,
-        http,
-        dir: targetDir,
-        url: repo,
-        singleBranch: true,
-        ref: branch,
-        depth: 1,
-    });
+    await git.clone({ fs, http, dir: targetDir, url: repo, singleBranch: true, ref: branch, depth: 1 });
+
+    // Launching offline copy and maximazing
     await win.loadFile(path.join(targetDir, "index.html"));
     win.maximize();
 }
 
 let win: electron.BrowserWindow;
 let tray: electron.Tray;
+let assetsPath: string;
+
+if (process.env.DEBUG) {
+    assetsPath = path.join(__dirname, "..", "assets");
+} else {
+    if (process.resourcesPath) {
+        assetsPath = path.join(process.resourcesPath, "assets");
+    } else {
+        assetsPath = path.join(app.getAppPath(), "assets");
+    }
+}
+
+const iconPath = path.join(assetsPath, "logo512.png");
 
 async function createWindow() {
     win = new BrowserWindow({
@@ -53,7 +64,9 @@ async function createWindow() {
         vibrancy: "under-window",
     });
 
+    // Checking if the app is running in production mode
     if (process.env.DEBUG !== "TRUE") {
+        // Disabling top bar and dev tools
         win.setMenuBarVisibility(false);
         win.setMenu(null);
     }
@@ -71,32 +84,47 @@ ipcMain.handle("download-offline-version", async (event, repo: string, branch: s
     await downloadOfflineVersion(repo, branch);
 });
 
-ipcMain.on("show-notification", (_, { title, body, icon }) => {
-    new electron.Notification({ title, body, icon }).show();
+ipcMain.on("show-notification", async (_, { title, body, icon }) => {
+    let img = null;
+
+    if (icon?.startsWith("http")) {
+        // Downloading icon if it's a URL
+        try {
+            const res = await axios.get(icon, { responseType: "arraybuffer" });
+            const pngBuf = await sharp(res.data).png().toBuffer();
+            img = nativeImage.createFromBuffer(pngBuf);
+        } catch (e) {
+            console.warn("Failed to load icon from URL:", e);
+        }
+    } else if (icon) {
+        // Just using if icon is a path
+        img = nativeImage.createFromPath(icon);
+    }
+
+    new electron.Notification({ title, body, icon: img || iconPath }).show();
 });
 
 app.setName("MinDesktop");
 
+// Adding app to autostart
+app.setLoginItemSettings({
+    openAtLogin: true,
+    openAsHidden: true,
+});
+
 app.whenReady().then(async () => {
     await createWindow();
 
-    let iconPath: string;
-    if (process.env.DEBUG) {
-        iconPath = path.join(__dirname, "..", "assets", "logo512.png");
-    } else {
-        if (process.resourcesPath) {
-            iconPath = path.join(process.resourcesPath, "assets", "logo512.png");
-        } else {
-            iconPath = path.join(app.getAppPath(), "assets", "logo512.png");
-        }
-    }
-
     tray = new Tray(iconPath);
 
+    // Creating context menu for tray
     const contextMenu = Menu.buildFromTemplate([
-        { label: "Open", click: () => win.show() },
+        { icon: iconPath, label: "Min Desktop", enabled: false }, // Semi-transparent icon with text
+        { type: "separator" },
+        { label: "Open Window", click: () => win.show() },
+        { label: "Hide Window", click: () => win.hide() },
         {
-            label: "Exit",
+            label: "Quit",
             click: () => {
                 customApp.isQuiting = true;
                 app.quit();
