@@ -13,8 +13,27 @@ import axios from "axios";
 
 config({ quiet: true });
 
+// Ensure Windows toast system uses our app id
+if (process.platform === "win32") {
+    app.setAppUserModelId("com.goosedes.mindesktop");
+}
+
 const customApp = app as electron.App & { isQuiting: boolean };
 customApp.isQuiting = false; // Variable that determines if the app is fully quiting or just closing the window
+
+// Prevent multiple instances
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+    app.quit();
+} else {
+    app.on("second-instance", () => {
+        if (win) {
+            if (win.isMinimized()) win.restore();
+            win.show();
+            win.focus();
+        }
+    });
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,7 +64,9 @@ if (process.env.DEBUG) {
     }
 }
 
-const iconPath = path.join(assetsPath, "logo512.png");
+const logo512Path = path.join(assetsPath, "logo512.png");
+const logo32Path = path.join(assetsPath, "logo32.png");
+const iconPath = path.join(assetsPath, process.platform === "win32" ? "icon.ico" : "icon.png");
 
 async function createWindow() {
     win = new BrowserWindow({
@@ -62,6 +83,9 @@ async function createWindow() {
         backgroundColor: "#00000000",
         vibrancy: "under-window",
     });
+    if (process.argv.includes("--hidden")) {
+        win.hide();
+    }
 
     // Checking if the app is running in production mode
     if (process.env.DEBUG !== "TRUE") {
@@ -109,16 +133,17 @@ app.setName("MinDesktop");
 app.setLoginItemSettings({
     openAtLogin: true,
     openAsHidden: true,
+    args: ["--hidden"],
 });
 
 app.whenReady().then(async () => {
     await createWindow();
 
-    tray = new Tray(iconPath);
+    tray = new Tray(logo32Path);
 
     // Creating context menu for tray
     const contextMenu = Menu.buildFromTemplate([
-        { icon: iconPath, label: "Min Desktop", enabled: false }, // Semi-transparent icon with text
+        { icon: logo32Path, label: "Min Desktop", enabled: false }, // Semi-transparent icon with text
         { type: "separator" },
         { label: "Open Window", click: () => win.show() },
         { label: "Hide Window", click: () => win.hide() },
@@ -141,4 +166,9 @@ app.whenReady().then(async () => {
             win.hide();
         }
     });
+
+    if (process.argv.includes("--hidden")) {
+        customApp.isQuiting = false;
+        app.quit();
+    }
 });
