@@ -1,6 +1,6 @@
 {
     "name": "min-desktop",
-    "version": "1.0.0",
+    "version": "beta-0.4",
     "description": "",
     "homepage": "https://github.com/gooseDes/min-desktop#readme",
     "bugs": {
@@ -19,7 +19,9 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "tsc && electron -r tsx src/index.ts",
-        "build": "tsc && electron-builder"
+        "build": "tsc && electron-builder",
+        "build-linux": "tsc && electron-builder --linux",
+        "build-win": "tsc && electron-builder --win"
     },
     "devDependencies": {
         "electron": "^38.1.2",
